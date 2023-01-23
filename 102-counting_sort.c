@@ -1,48 +1,54 @@
 #include "sort.h"
+#include "stdlib.h"
 
 /**
- * counting_sort - Sorts an array of integers in ascending
- * order using the Counting sort algorithm
+ * counting_sort - sorts an array of integers in ascending order using the
+ * Counting sort algorithm
+ * @array: array to sort
+ * @size: size of the array to sort
  *
- * @array: The array to be sorted.
- * @size: The size of the array.
- *
+ * Return: void
  */
-
 void counting_sort(int *array, size_t size)
 {
-	size_t i = 1;
-	int max, j;
-	int *counter, *temp;
+	int i, max;
+	int *count = NULL, *copy = NULL;
+	size_t j, temp, total = 0;
 
-	if (size < 2)
+
+	if (array == NULL || size < 2)
 		return;
-
-	max = array[0];
-
-	for (; i < size; i++)
+	copy = malloc(sizeof(int) * size);
+	if (copy == NULL)
+		return;
+	for (j = 0, max = 0; j < size; j++)
 	{
-		if (array[i] > max)
-			max = array[i];
+		copy[j] = array[j];
+		if (array[j] > max)
+			max = array[j];
 	}
-
-	temp = malloc(sizeof(int) * size);
-
-	counter = malloc(sizeof(int) * max + 1);
-
-	for (i = 0; i < size; i++)
-		counter[array[i]] += 1;
-	for (j = 1; j <= max; j++)
-		counter[j] = counter[j] + counter[j - 1];
-
-	print_array(counter, max + 1);
-
-	for (i = 0; i < size; i++)
-		temp[counter[array[i] - 1]] = array[i];
-
-	for (i = 0; i < size; i++)
-		array[i] = temp[i];
-
-	free(temp);
-	free(counter);
+	count = malloc(sizeof(int) * (max + 1));
+	if (count == NULL)
+	{
+		free(copy);
+		return;
+	}
+	for (i = 0; i <= max; i++)
+		count[i] = 0;
+	for (j = 0; j < size; j++)
+		count[array[j]] += 1;
+	for (i = 0; i <= max; i++)
+	{
+		temp = count[i];
+		count[i] = total;
+		total += temp;
+	}
+	for (j = 0; j < size; j++)
+	{
+		array[count[copy[j]]] = copy[j];
+		count[copy[j]] += 1;
+	}
+	print_array(count, max + 1);
+	free(count);
+	free(copy);
 }
